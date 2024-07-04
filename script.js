@@ -1,0 +1,55 @@
+//Данные моего приложения
+const client_id = 'b1f2f839bee74b818813d23dfe33a048'
+const client_secret = '850cb5d402fa40dba0d0079ee495f89c'
+let accessToken = '';
+
+//Штука для получения токена
+async function getToken() {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+        'grant_type': 'client_credentials',
+    }),
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret)//(Buffer.from(client_id + ':' + client_secret).toString('base64')),
+    },
+    });
+
+    const data = await response.json();
+    accessToken = data.access_token;
+}
+
+//штука для получения инфы о треке
+async function getTrackInfo(track_id) {
+    const response = await fetch(`https://api.spotify.com/v1/tracks/${track_id}`, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + accessToken },
+    });
+  
+    return await response.json();
+  }
+
+async function getArtistInfo(artist_id) {
+    const response = await fetch(`https://api.spotify.com/v1/artists/${artist_id}`, {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + accessToken },
+    });
+
+    return await response.json();
+}
+
+async function logTrackInfo(artist_id){
+    await getToken();
+
+    let data = await getArtistInfo(artist_id)
+    console.log(data);
+}
+
+logTrackInfo('5WoWlP0ihSFIxnppxjwSgE')
+// а это печать инфы о треке
+// getToken().then(response => {
+//     getTrackInfo(response.access_token, '3PLiVjlq6IgsWSe2iUyVhZ').then(profile => {
+//       console.log(profile)
+//     })
+//   });
